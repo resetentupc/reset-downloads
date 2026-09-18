@@ -1,0 +1,32 @@
+name: Build Chocolatey Package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Chocolatey
+        uses: chocolatey/setup-choco@v3
+
+      - name: Build NUPKG Package
+        shell: pwsh
+        run: |
+          $nuspec = Get-ChildItem -Filter *.nuspec
+          if ($nuspec) {
+              choco pack $nuspec.Name
+          } else {
+              throw "No se encontró ningún archivo .nuspec en el repositorio."
+          }
+
+      - name: Upload NUPKG to Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: '*.nupkg'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
