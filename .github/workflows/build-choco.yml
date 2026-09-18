@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Chocolatey
-        uses: chocolatey/setup-choco@v3
+        uses: crazy-max/gh-action-chocolatey@v3
 
       - name: Build NUPKG Package
         shell: pwsh
