@@ -22,20 +22,41 @@ jobs:
           iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           echo "$env:ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
 
-      - name: Download Release ZIP Asset
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          file: '.zip'
-          target: '.'
+      - name: Download Release ZIP Natively
+        shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $repo = "${{ github.repository }}"
+          $tag = "${{ github.event.release.tag_name }}"
+          
+          Write-Host "Buscando assets para el release $tag en el repositorio $repo..."
+          
+          # Consultar la API de GitHub para obtener la lista de assets del release
+          $headers = @{ "Authorization" = "token $env:GITHUB_TOKEN" }
+          $apiUrl = "https://api.github.com/repos/$repo/releases/tags/$tag"
+          $releaseInfo = Invoke-RestMethod -Uri $apiUrl -Headers $headers -Method Get
+          
+          # Encontrar el archivo .zip adjunto
+          $zipAsset = $releaseInfo.assets | Where-Object { $_.name -like "*.zip" } | Select-Object -First 1
+          
+          if (-not $zipAsset) {
+              throw "No se encontró ningún archivo .zip adjunto en este release."
+          }
+          
+          $downloadUrl = $zipAsset.browser_download_url
+          $fileName = $zipAsset.name
+          
+          Write-Host "Descargando: $fileName desde $downloadUrl..."
+          Invoke-WebRequest -Uri $downloadUrl -OutFile $fileName -Headers $headers
+          Write-Host "¡Descarga completada con éxito!"
 
       - name: Build NUPKG Package Dynamically
         shell: pwsh
         run: |
           $zipAsset = Get-ChildItem -Filter *.zip | Select-Object -First 1
           if (-not $zipAsset) {
-              throw "No se encontró ningún archivo .zip descargado."
+              throw "No se encontró ningún archivo .zip en el directorio."
           }
 
           $baseName = $zipAsset.BaseName
