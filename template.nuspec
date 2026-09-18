@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- Ejemplo de ID: reset-epson-l3210 o reset-canon-g2110 -->
+    <id>reset-$MARCA$-$MODELO$</id>
+    <version>1.0.0</version>
+    <title>Reset $MARCA$ $MODELO$</title>
+    <authors>ResetEntuPc</authors>
+    <owners>ResetEntuPc</owners>
+    <description>Software de reseteo para impresoras $MARCA$ $MODELO$.</description>
+    <tags>reset $MARCA$ $MODELO$ software</tags>
+    <packageSourceUrl>https://github.com/resetentupc/reset-downloads</packageSourceUrl>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
