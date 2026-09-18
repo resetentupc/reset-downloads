@@ -1,12 +1,10 @@
 $packageName = $env:ChocolateyPackageName
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
-# Separa el nombre del paquete: reset-epson-l3210 -> [0]=reset, [1]=epson, [2]=l3210
 $partes     = $packageName -split '-'
 $marca      = $partes[1]
 $modelo     = $partes[2]
 
-# URL dinámica apuntando al release correspondiente en tu GitHub
 $url        = "https://github.com/resetentupc/reset-downloads/releases/download/v1.0.5/reset-$marca-$modelo.zip"
 
 $installArgs = @{
@@ -16,6 +14,16 @@ $installArgs = @{
   checksumType  = 'sha256'
 }
 
+# Descarga y descomprime el ZIP en la ruta de Chocolatey
 Install-ChocolateyZipPackage @installArgs
 
-Write-Host "Instalación completada para la impresora $marca $modelo." -ForegroundColor Green
+# Buscar automáticamente el archivo ejecutable (.exe) dentro de la carpeta extraída
+$exeFile = Get-ChildItem -Path "$toolsDir\extracted" -Filter "*.exe" -Recurse | Select-Object -First 1
+
+if ($exeFile) {
+    Write-Host "Ejecutando la herramienta de reseteo: $($exeFile.FullName)" -ForegroundColor Green
+    # Inicia el programa de reseteo para el usuario de forma automática
+    Start-Process -FilePath $exeFile.FullName
+} else {
+    Write-Warning "No se encontró ningún archivo ejecutable (.exe) en el paquete descomprimido."
+}
