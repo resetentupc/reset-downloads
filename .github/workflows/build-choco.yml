@@ -22,15 +22,39 @@ jobs:
           iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           echo "$env:ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
 
-      - name: Build NUPKG Package
+      - name: Extract Brand and Model, and Update Nuspec
         shell: pwsh
         run: |
-          $nuspec = Get-ChildItem -Filter *.nuspec
-          if ($nuspec) {
-              choco pack $nuspec.Name
-          } else {
-              throw "No se encontró ningún archivo .nuspec en el repositorio."
+          # Busca el archivo zip en el release (ej: reset-epson-l3210.zip)
+          $zipAsset = Get-ChildItem -Filter *.zip | Select-Object -First 1
+          if (-not $zipAsset) {
+              throw "No se encontró ningún archivo .zip en el repositorio."
           }
+
+          $baseName = $zipAsset.BaseName # Ejemplo: reset-epson-l3210
+          $parts = $baseName -split '-'   # Separa por guiones
+          
+          if ($parts.Length -ge 3) {
+              $marca = $parts[1]          # epson
+              $modelo = $parts[2]         # l3210
+          } else {
+              throw "El nombre del ZIP debe seguir el formato: reset-marca-modelo.zip"
+          }
+
+          Write-Host "Marca detectada: $marca"
+          Write-Host "Modelo detectado: $modelo"
+
+          # Reemplaza dinámicamente las variables en el template.nuspec
+          $nuspecContent = Get-Content -Path "template.nuspec" -Raw
+          $nuspecContent = $nuspecContent -replace '\$MARCA\$', $marca
+          $nuspecContent = $nuspecContent -replace '\$MODELO\$', $modelo
+          
+          # Guarda el archivo final con el nombre correcto del paquete
+          $finalNuspecName = "reset-$marca-$modelo.nuspec"
+          Set-Content -Path $finalNuspecName -Value $nuspecContent
+
+          # Empaqueta usando el nuspec dinámico
+          choco pack $finalNuspecName
 
       - name: Upload NUPKG to Release Assets
         uses: softprops/action-gh-release@v2
