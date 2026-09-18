@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>reset-epson-l3210</id>
-    <version>1.0.3</version>
-    <title>Reset Epson L3210</title>
+    <id>reset-$MARCA$-$MODELO$</id>
+    <version>1.0.5</version>
+    <title>Reset $MARCA$ $MODELO$</title>
     <authors>ResetEntuPc</authors>
     <owners>ResetEntuPc</owners>
-    <description>Software de reseteo para impresoras Epson L3210.</description>
-    <tags>reset epson l3210 software</tags>
+    <description>Software de reseteo profesional para impresoras $MARCA$ $MODELO$.</description>
+    <tags>reset $MARCA$ $MODELO$ software</tags>
     <packageSourceUrl>https://github.com/resetentupc/reset-downloads</packageSourceUrl>
   </metadata>
   <files>
