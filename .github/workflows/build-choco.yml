@@ -11,8 +11,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Chocolatey
-        uses: crazy-max/gh-action-chocolatey@v3
+      - name: Install Chocolatey Natively
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          echo "$env:ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
 
       - name: Build NUPKG Package
         shell: pwsh
