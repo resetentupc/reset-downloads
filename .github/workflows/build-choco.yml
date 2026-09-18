@@ -22,12 +22,20 @@ jobs:
           iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           echo "$env:ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
 
+      - name: Download Release ZIP Asset
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          file: '.zip'
+          target: '.'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build NUPKG Package Dynamically
         shell: pwsh
         run: |
           $zipAsset = Get-ChildItem -Filter *.zip | Select-Object -First 1
           if (-not $zipAsset) {
-              throw "No se encontró ningún archivo .zip."
+              throw "No se encontró ningún archivo .zip descargado."
           }
 
           $baseName = $zipAsset.BaseName
