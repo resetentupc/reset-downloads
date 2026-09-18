@@ -1,13 +1,13 @@
 $packageName = $env:ChocolateyPackageName
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
-# Si el paquete se llama 'reset-epson-l3210', esto separa la marca y el modelo automáticamente
+# Separa el nombre del paquete: reset-epson-l3210 -> [0]=reset, [1]=epson, [2]=l3210
 $partes     = $packageName -split '-'
-$marca      = $partes[1] # epson
-$modelo     = $partes[2] # l3210
+$marca      = $partes[1]
+$modelo     = $partes[2]
 
-# Descarga dinámica apuntando al release en GitHub
-$url        = "https://github.com/resetentupc/reset-downloads/releases/download/v1.0.0/reset-$marca-$modelo.zip"
+# URL dinámica apuntando al release correspondiente en tu GitHub
+$url        = "https://github.com/resetentupc/reset-downloads/releases/download/v1.0.5/reset-$marca-$modelo.zip"
 
 $installArgs = @{
   packageName   = $packageName
